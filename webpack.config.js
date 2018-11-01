@@ -7,6 +7,7 @@ module.exports = {
 		publicPath: '/',
 		filename: 'bundle.js'
 	},
+	devtool: '#eval',
 	devServer: {
 		contentBase: './dist',
 		hot: true

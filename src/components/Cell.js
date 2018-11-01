@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 
+
 class Cell extends Component {
 	constructor(props){
 		super(props);
@@ -11,12 +12,12 @@ class Cell extends Component {
 
 	render(){
 		const {
-			id
+			cell_state	
 		} = this.props;
-		console.log('id', id);
+		// console.log('cell_state', cell_state);
 		return (
 			<div>
-				{id}
+				{cell_state.id}
 			</div>
 		);
 	}

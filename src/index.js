@@ -1,11 +1,17 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { render } from 'react-dom';
 import MineSweeper from './components/MineSweeper';
+import { createStore } from 'redux';
+import { Provider } from 'react-redux';
+import { mineSweeper } from './redux/reducer';
 
 
-console.log("hello world");
-ReactDOM.render(
-	<MineSweeper />,
+const store = createStore(mineSweeper);
+
+render(
+	<Provider store={store}>
+		<MineSweeper />
+	</Provider>,
 	document.getElementById('app')
 );
 

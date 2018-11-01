@@ -1,5 +1,5 @@
 import React, { PureComponent, Component } from 'react';
-import Row									from './Board';
+import Row									from './Row';
 import Cell									from './Cell';
 
 
@@ -8,18 +8,58 @@ class MineSweeper extends Component {
 		super(props);
 		this.state = {
 			level: "BEGINNER",
+			mines: 10,
 			board: [],
 		}
 		this.buildBoard = this.buildBoard.bind(this);
-		this.returnCell = this.returnCell.bind(this);
 		this.switchLevels = this.switchLevels.bind(this);
 		this.setBoardObject = this.setBoardObject.bind(this);
+		this.setMines = this.setMines.bind(this);
+	}
+
+	setMines(rows, columns){
+		let placed = 0;
+		const mines = this.state.mines;
+		const board = this.state.board;
+		if(board[3] === undefined){
+			return;
+		}
+		const temp = board[3];
+		console.log('mines ', temp[0]);
+		// const column = Math.floor(Math.random() * columns);
+		// const row = Math.floor(Math.random() * rows);
+		// console.log('MINE ', board[row][column])
+		// do {
+		// 	const column = Math.floor(Math.random() * columns);
+		// 	const row = Math.floor(Math.random() * rows);
+			// console.log('MINE ', board[row][column])
+			// console.log('MINE ', board)
+			// placed++
+		// } while (placed != mines);
+	}
+
+
+	buildBoard(board){
+		const rows = board.height;
+		const columns = board.width;
+		for (let row = 0; row <= rows; row++){
+			let row_array = [];
+			for (let column = 1; column <= columns; column++){
+				const cell = {
+					id: row + "-" + column,
+					content: null,
+					}
+				row_array.push(cell);
+			}
+			this.setBoardObject(row_array);
+			this.setMines(rows, columns);
+		}
 	}
 
 	setBoardObject(row){
-		const old_board = this.state.board;
-		old_board.push([row]);
-		this.setState({board: old_board});
+		const new_board = this.state.board;
+		new_board.push(row);
+		this.setState({board: new_board});
 	}
 
 	switchLevels(level=this.state.level){
@@ -63,21 +103,7 @@ class MineSweeper extends Component {
 		}
 	}
 
-	returnCell(id){
-		console.log('cell id', id);
-		return ( <Cell id={id} /> );
-	}
 
-	buildBoard(board){
-		for (let row = 0; row <= board.height; row++){
-			let row_array = [];
-			for (let column = 0; column <= board.width; column++){
-				const id = row + "-" + column;
-				row_array.push(id);
-			}
-			this.setBoardObject(row_array);
-		}
-	}
 
 	componentDidMount(){
 		this.switchLevels();
@@ -88,11 +114,10 @@ class MineSweeper extends Component {
 			return(
 				<div>
 					{this.state.board.map((row, index) => {
-						console.log('index', index);
 						return (
 							<Row
 								key={'row' + index}
-								row={row[0]}/>
+								row={row}/>
 							);
 					})}
 				</div>
