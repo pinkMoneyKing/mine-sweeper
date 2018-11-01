@@ -84,19 +84,19 @@ class MineSweeper extends Component {
 	}
 
 	render() {
-		if(this.state.board.length === 10){
+		if(this.state.board.length != 0){
 			return(
-			<div>
-				{this.state.board.map((row, index) => {
-					console.log('index', index);
-					return (
-						<Row
-							key={'row' + index}
-							row={row[0]}/>
-						);
-				})}
-			</div>
-		)
+				<div>
+					{this.state.board.map((row, index) => {
+						console.log('index', index);
+						return (
+							<Row
+								key={'row' + index}
+								row={row[0]}/>
+							);
+					})}
+				</div>
+			)
 		} else {
 			console.log(this.state.board.length);
 			return (

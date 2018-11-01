@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import Cell									from './Cell';
 
-class Row extends Component {
+class Row extends PureComponent {
 	constructor(props){
 		super(props);
 		this.state = {
