@@ -1,19 +1,19 @@
-const ADD_CELL			= 'ADD_CELL';
+const UPDATE_CELL		= 'UPDATE_CELL';
 const ADD_ROW				= 'ADD_ROW';		
 const ADD_MINE			= 'ADD_MINE';		
 const CHANGE_LEVEL	= 'CHANGE_LEVEL';
 const CLEAR_BOARD		= 'CLEAR_BOARD';
 
 
-export function addCell(cell){
+export function updateCell(position, id){
 	return {
-		type: ADD_CELL,
-		cell
+		type: UPDATE_CELL,
+		position,
+		id
 	}
 }
 
 export function addRow(row){
-	console.log('adding row action : ', row.toJS());
 	return {
 		type: ADD_ROW,
 		row

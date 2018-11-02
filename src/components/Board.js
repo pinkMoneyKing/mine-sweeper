@@ -25,7 +25,7 @@ export default class Board extends PureComponent {
 		const {
 			board
 		} = this.props;
-			console.log('board', board.toJS());
+			console.log('board', board);
 			return (		
 				<div>
 					{board.map((row, index) => {
@@ -35,6 +35,7 @@ export default class Board extends PureComponent {
 								row={row}/>
 							);
 					})}
+					
 				</div>
 		);
 	}

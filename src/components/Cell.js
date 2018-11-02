@@ -10,9 +10,11 @@ class Cell extends Component {
 		const {
 			cell_state	
 		} = this.props;
+		console.log('cell_state', cell_state.toJS());
 		return (
 			<div>
-				{cell_state.get('id', 'no id found')}
+				{cell_state.get('content', 'no id found')}
+				 : 
 			</div>
 		);
 	}
