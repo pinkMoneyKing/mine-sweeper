@@ -14,7 +14,6 @@ class Cell extends Component {
 		return (
 			<div>
 				{cell_state.get('content', 'no id found')}
-				 : 
 			</div>
 		);
 	}

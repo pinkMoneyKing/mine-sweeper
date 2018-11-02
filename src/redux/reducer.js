@@ -8,10 +8,12 @@ const CLEAR_BOARD		= 'CLEAR_BOARD';
 
 
 const initialState = Immutable.fromJS({
-	level: "BEGINNER",
-	mines: 10,
-	rows: 9,
-	columns: 9,
+	level: Immutable.fromJS({
+		difficulty: "BEGINNER",
+		mines: null,
+		rows: null,
+		columns: null,
+	}),
 	board: Immutable.List([]),
 	mine_positions: Immutable.List([]),
 });
@@ -19,16 +21,18 @@ const initialState = Immutable.fromJS({
 export function mineSweeper(state = initialState, action){
 	switch(action.type){
 			case CLEAR_BOARD:
-				return state.set('board', Immutable.List([]));
+				return initialState;
 			case ADD_ROW:
 				return state.update('board', boardList => boardList.push(action.row));
 			case ADD_MINE:
-				return state.update('mine_positions', mineList => mineList.push(action.mine));
+				return state.update('mine_positions', mineList => mineList.push(action.mine_id));
 			case UPDATE_CELL:
 				const row = action.position.get('row');
 				const column = action.position.get('column');
-				return state.update('board', boardList =>  boardList.setIn([row, column, 'content'], 'MINE'));
+				return state.update('board', boardList =>  boardList.setIn([row, column, 'content'], action.content));
 
+			case CHANGE_LEVEL:
+				return state.set('level', action.level);
 			default:
 				return state;
 		}	

@@ -5,11 +5,12 @@ const CHANGE_LEVEL	= 'CHANGE_LEVEL';
 const CLEAR_BOARD		= 'CLEAR_BOARD';
 
 
-export function updateCell(position, id){
+export function updateCell(position, id, content){
 	return {
 		type: UPDATE_CELL,
 		position,
-		id
+		id,
+		content
 	}
 }
 
@@ -20,10 +21,10 @@ export function addRow(row){
 	}
 }
 
-export function addMine(mine){
+export function addMine(mine_id){
 	return {
 		type: ADD_MINE,
-		mine
+		mine_id
 	}
 }
 

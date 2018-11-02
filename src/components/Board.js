@@ -35,7 +35,6 @@ export default class Board extends PureComponent {
 								row={row}/>
 							);
 					})}
-					
 				</div>
 		);
 	}
