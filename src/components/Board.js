@@ -1,7 +1,18 @@
 import React, { PureComponent } from 'react';
-import Cell									from './Cell';
+import Cell											from './Cell';
+import { connect }							from 'react-redux';
+import Immutable								from 'immutable';
+import Row									from './Row';
 
-class Row extends PureComponent {
+
+const mapStateToProps = (state) => {
+	return {
+		board: state.get('board', Immutable.List())
+	}
+}
+
+@connect(mapStateToProps)
+export default class Board extends PureComponent {
 	constructor(props){
 		super(props);
 		this.state = {
@@ -12,21 +23,19 @@ class Row extends PureComponent {
 
 	render(){
 		const {
-			row
+			board
 		} = this.props;
+			console.log('board', board.toJS());
 			return (		
 				<div>
-					{row.map(column => {
-						return (<Cell
-							key={column}
-							id={column}
-						/>)
+					{board.map((row, index) => {
+						return (
+							<Row
+								key={index}
+								row={row}/>
+							);
 					})}
 				</div>
 		);
 	}
 }
-
-
-export default Row;
-

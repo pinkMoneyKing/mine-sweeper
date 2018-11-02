@@ -1,20 +1,52 @@
 import React, { PureComponent, Component } from 'react';
 import Row									from './Row';
 import Cell									from './Cell';
+import Board								from './Board';
+import { connect }					from 'react-redux';
+import { 
+	addRow,
+	clearBoard
+}														from '../redux/actions';
+import Immutable						from 'immutable';
 
 
-class MineSweeper extends Component {
+const mapStateToProps = (state) => {
+	return {
+		level: state.get('level'),
+	}	
+}
+
+const mapDispathToProps = (dispatch) => {
+	return {
+		addRowDisptach: (row) => {
+			dispatch(addRow(row))
+		},
+		clearBoardDispatch: () => {
+			dispatch(clearBoard())
+		}
+	}
+}
+
+
+@connect(mapStateToProps, mapDispathToProps)
+export default class MineSweeper extends Component {
 	constructor(props){
 		super(props);
 		this.state = {
-			level: "BEGINNER",
-			mines: 10,
-			board: [],
+			loading_game: true,
+			// level: "BEGINNER",
+			// mines: 10,
+			// board: [],
 		}
+		this.setLoadingGame = this.setLoadingGame.bind(this);
 		this.buildBoard = this.buildBoard.bind(this);
-		this.switchLevels = this.switchLevels.bind(this);
-		this.setBoardObject = this.setBoardObject.bind(this);
 		this.setMines = this.setMines.bind(this);
+		this.switchLevels = this.switchLevels.bind(this);
+		this.initGame = this.initGame.bind(this);
+	}
+
+	setLoadingGame(game_state){
+		return this.setState({loading_game: game_state});
 	}
 
 	setMines(rows, columns){
@@ -40,42 +72,39 @@ class MineSweeper extends Component {
 
 
 	buildBoard(board){
+		const addRowDisptach = this.props.addRowDisptach;
 		const rows = board.height;
 		const columns = board.width;
 		for (let row = 0; row <= rows; row++){
-			let row_array = [];
+			let row_array = Immutable.List();
 			for (let column = 1; column <= columns; column++){
-				const cell = {
+				const cell = Immutable.fromJS({
 					id: row + "-" + column,
-					content: null,
-					}
-				row_array.push(cell);
+					content: 'EMPTY',
+					status: 'HIDDEN',
+					});
+				row_array = row_array.set(row_array.size, cell);
+
 			}
-			this.setBoardObject(row_array);
-			this.setMines(rows, columns);
+			// console.log('row_array : ', row_array);
+			addRowDisptach(row_array);
+			// this.setMines(rows, columns);
 		}
+		this.setLoadingGame(false);
 	}
 
-	setBoardObject(row){
-		const new_board = this.state.board;
-		new_board.push(row);
-		this.setState({board: new_board});
-	}
 
-	switchLevels(level=this.state.level){
+	switchLevels(level){
 		switch(level){
 				case 'BEGINNER':
-					console.log('beginner');
 					let board = {
 						mines: 10,
 						width: 9,
 						height: 9,
 					};
-					console.log('board', board);
 					this.buildBoard(board);
 					break;
 				case 'INTERMEDIATE':
-					console.log('intermediate');
 					board = {
 						mines: 40,
 						width: 18,
@@ -84,7 +113,6 @@ class MineSweeper extends Component {
 					this.buildBoard(board);
 					break;
 				case 'EXPERT':
-					console.log('EXPERT');
 					board = {
 						mines: 99,
 						width: 26,
@@ -103,35 +131,41 @@ class MineSweeper extends Component {
 		}
 	}
 
+	initGame(){
+		const {
+			level,
+			clearBoardDispatch
+			} = this.props;
+		clearBoardDispatch();
+		this.switchLevels(level);
+	}
+
 
 
 	componentDidMount(){
-		this.switchLevels();
+		this.initGame();
 	}
 
 	render() {
-		if(this.state.board.length != 0){
-			return(
-				<div>
-					{this.state.board.map((row, index) => {
-						return (
-							<Row
-								key={'row' + index}
-								row={row}/>
-							);
-					})}
-				</div>
-			)
-		} else {
-			console.log(this.state.board.length);
-			return (
-				<div>
-					loading
-				</div>
-			)
-		}
+		return(
+			<div>
+				<Board />
+			</div>
+		)
 	}
 }
 
 
-export default MineSweeper;
+// mapStateToProps = (state) => {
+// 	return;
+// }
+
+// mapDispathToProps = (dispatch) => {
+// 	return {
+// 		addRowDisptach: (row) => {
+// 			dispatch(addRow(row))
+// 		}
+// 	}
+// }
+
+// export default MineSweeper;
