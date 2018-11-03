@@ -5,12 +5,13 @@ const CHANGE_LEVEL	= 'CHANGE_LEVEL';
 const CLEAR_BOARD		= 'CLEAR_BOARD';
 
 
-export function updateCell(position, id, content){
+export function updateCell(position, id, key, value){
 	return {
 		type: UPDATE_CELL,
 		position,
 		id,
-		content
+		key,
+		value
 	}
 }
 

@@ -29,7 +29,7 @@ export function mineSweeper(state = initialState, action){
 			case UPDATE_CELL:
 				const row = action.position.get('row');
 				const column = action.position.get('column');
-				return state.update('board', boardList =>  boardList.setIn([row, column, 'content'], action.content));
+				return state.update('board', boardList =>  boardList.setIn([row, column, action.key], action.value));
 
 			case CHANGE_LEVEL:
 				return state.set('level', action.level);

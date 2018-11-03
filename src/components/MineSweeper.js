@@ -30,8 +30,8 @@ const mapDispathToProps = (dispatch) => {
 		clearBoardDispatch: () => {
 			dispatch(clearBoard())
 		},
-		updateCellDispatch: (position, id, content) => {
-			dispatch(updateCell(position, id, content))
+		updateCellDispatch: (position, id, key, value) => {
+			dispatch(updateCell(position, id, key, value))
 		},
 		addMineDispatch: (mine_id) => {
 			dispatch(addMine(mine_id))
@@ -53,15 +53,55 @@ export default class MineSweeper extends Component {
 		this.setbuildingBoard = this.setbuildingBoard.bind(this);
 		this.buildBoard = this.buildBoard.bind(this);
 		this.setMines = this.setMines.bind(this);
+		this.setProximityMineCount = this.setProximityMineCount.bind(this);
 		this.switchLevels = this.switchLevels.bind(this);
 		this.initGame = this.initGame.bind(this);
 		this.setLevel = this.setLevel.bind(this);
+		this.returnMineCount = this.returnMineCount.bind(this);
 
+	}
+
+	returnMineCount(row, column){
+		const board = this.props.board;
+
+		if(board.getIn([row, column, 'content']) === 'MINE'){
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+
+	setProximityMineCount(){
+		const {
+			board,
+			updateCellDispatch,
+		} = this.props;
+
+		board.map((row, row_index) => {
+			row.map((column, column_index) => {
+				const cell_id = column.get('id');
+				const mine_count = (
+					this.returnMineCount(row_index-1, column_index-1) +
+					this.returnMineCount(row_index-1, column_index) +
+					this.returnMineCount(row_index-1, column_index+1) +
+					this.returnMineCount(row_index, column_index-1) +
+					this.returnMineCount(row_index, column_index+1) +
+					this.returnMineCount(row_index+1, column_index-1) +
+					this.returnMineCount(row_index+1, column_index) +
+					this.returnMineCount(row_index+1, column_index+1)
+				);
+				if(column.get('content') != 'MINE'){
+					const position = Immutable.fromJS({row: row_index, column: column_index});
+					updateCellDispatch(position, cell_id, 'content', mine_count);
+				}
+			});
+		});
 	}
 
 	setLevel(level){
 		changeLevelDispatch(level);
 	}
+
 	setbuildingBoard(board){
 		return this.setState({loading_board: board});
 	}
@@ -85,7 +125,7 @@ export default class MineSweeper extends Component {
 				if(!mine_positions.includes(mine_id)){
 					const position = Immutable.fromJS({row: row, column: column});
 					const id = mine_id;
-					updateCellDispatch(position, id, 'MINE');
+					updateCellDispatch(position, id, 'content', 'MINE');
 					addMineDispatch(id);
 					placed++;
 				}
@@ -109,9 +149,7 @@ export default class MineSweeper extends Component {
 				row_array = row_array.set(row_array.size, cell);
 
 			}
-			// console.log('row_array : ', row_array);
 			addRowDisptach(row_array);
-			// this.setMines(rows, columns);
 		}
 
 		const board_state = this.props.board;
@@ -176,6 +214,7 @@ export default class MineSweeper extends Component {
 		// this.switchLevels(level);
 		buildBoard.then(() => {
 			this.setMines();
+			this.setProximityMineCount();
 		});
 	}
 
@@ -186,7 +225,6 @@ export default class MineSweeper extends Component {
 	}
 
 	render() {
-		console.log('mines ', this.props.mine_positions.toJS());
 		return(
 			<div>
 				<Board />
