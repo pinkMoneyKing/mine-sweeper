@@ -46,14 +46,28 @@ export default class Cell extends Component {
 	constructor(props){
 		super(props);
 		this.handleClick = this.handleClick.bind(this);
+		this.revealCell = this.revealCell.bind(this);
 	}
-	handleClick(id){
+	revealCell(position, cell){
 		const { updateCellDispatch } = this.props;
+		const id = cell.get('id');
+		updateCellDispatch(position, id, 'status', 'REVEALED');
+	}
+
+	handleClick(cell){
+		const id = cell.get('id');
+		const { updateCellDispatch } = this.props;
+		const cell_content = cell.get('content');
 		const position = Immutable.fromJS({
 			row: id[0],
 			column: id[2]
 		});
-		updateCellDispatch(position, id, 'status', 'REVEALED');
+		if(cell_content != 'MINE'){
+			this.revealCell(position, cell);
+		} else if (cell_content === 'MINE'){
+			updateCellDispatch(position, id, 'content', 'BOMB');
+			this.revealCell(position, cell);
+		}
 	}
 	render(){
 		const {
@@ -64,13 +78,13 @@ export default class Cell extends Component {
 		const id = cell_state.get('id');
 		if(status === 'REVEALED'){
 			return( <ImageComponent 
-				id={id}
+				cell_state={cell_state}
 				cell_content={cell_content} 
 				handleClick={this.handleClick}
 			/>);
 		} else {
 			return( <ImageComponent 
-				id={id}
+				cell_state={cell_state}
 				cell_content={'HIDDEN'} 
 				handleClick={this.handleClick}
 			/>);
