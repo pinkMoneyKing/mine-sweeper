@@ -5,13 +5,6 @@ import Immutable								from 'immutable';
 import Row									from './Row';
 
 
-const mapStateToProps = (state) => {
-	return {
-		board: state.get('board', Immutable.List())
-	}
-}
-
-@connect(mapStateToProps)
 export default class Board extends PureComponent {
 	constructor(props){
 		super(props);

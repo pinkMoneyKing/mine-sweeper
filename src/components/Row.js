@@ -3,11 +3,9 @@ import Cell									from './Cell';
 import Immutable								from 'immutable';
 
 
-const RowStyled = {
+const RowStyle = {
 	display: 'flex',
-	border: '2px solid pink',
 }
-
 
 class Row extends PureComponent {
 	constructor(props){
@@ -19,13 +17,14 @@ class Row extends PureComponent {
 			row
 		} = this.props;
 			return (		
-			<div
-				style={RowStyled}>
+			<div style={RowStyle}>
 					{row.map(cell => {
-						return (<Cell
-							key={cell.get('id', 'no id found')}
-							cell_state={cell}
-						/>)
+						return (
+							<Cell
+								key={cell.get('id', 'no id found')}
+								cell_state={cell}
+							/>
+						)
 					})}
 				</div>
 		);

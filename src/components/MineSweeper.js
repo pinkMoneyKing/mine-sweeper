@@ -1,7 +1,6 @@
 import React, { PureComponent, Component } from 'react';
-import Row									from './Row';
-import Cell									from './Cell';
 import Board								from './Board';
+import Immutable						from 'immutable';
 import { connect }					from 'react-redux';
 import { 
 	addRow,
@@ -10,8 +9,13 @@ import {
 	addMine,
 	changeLevel,
 }														from '../redux/actions';
-import Immutable						from 'immutable';
 
+
+const BoardClass = {
+	display: 'flex',
+	justifyContent: 'center',
+	marginTop: '5em',
+}
 
 const mapStateToProps = (state) => {
 	return {
@@ -50,7 +54,6 @@ export default class MineSweeper extends Component {
 		this.state = {
 			loading_board: true,
 		}
-		this.setbuildingBoard = this.setbuildingBoard.bind(this);
 		this.buildBoard = this.buildBoard.bind(this);
 		this.setMines = this.setMines.bind(this);
 		this.setProximityMineCount = this.setProximityMineCount.bind(this);
@@ -58,7 +61,11 @@ export default class MineSweeper extends Component {
 		this.initGame = this.initGame.bind(this);
 		this.setLevel = this.setLevel.bind(this);
 		this.returnMineCount = this.returnMineCount.bind(this);
+		this.setLoadingStatus = this.setLoadingStatus.bind(this);
+	}
 
+	setLoadingStatus(status){
+		this.setState({loading_board: status});
 	}
 
 	returnMineCount(row, column){
@@ -96,14 +103,11 @@ export default class MineSweeper extends Component {
 				}
 			});
 		});
+		this.setLoadingStatus(false);
 	}
 
 	setLevel(level){
 		changeLevelDispatch(level);
-	}
-
-	setbuildingBoard(board){
-		return this.setState({loading_board: board});
 	}
 
 	setMines(){
@@ -116,22 +120,20 @@ export default class MineSweeper extends Component {
 			addMineDispatch,
 		} = this.props;
 		const loading_board = this.state.loading_board;
-		if(!loading_board){
-			while(placed != mines) {
-				const column = Math.floor(Math.random() * board.size);
-				const row = Math.floor(Math.random() * board.size);
-				const new_mine = board.getIn([row, column], 'position not found');
-				const mine_id = new_mine.get('id');
-				if(!mine_positions.includes(mine_id)){
-					const position = Immutable.fromJS({row: row, column: column});
-					const id = mine_id;
-					updateCellDispatch(position, id, 'content', 'MINE');
-					addMineDispatch(id);
-					placed++;
+		while(placed != mines) {
+			const column = Math.floor(Math.random() * board.size);
+			const row = Math.floor(Math.random() * board.size);
+			const new_mine = board.getIn([row, column], 'position not found');
+			const mine_id = new_mine.get('id');
+			if(!mine_positions.includes(mine_id)){
+				const position = Immutable.fromJS({row: row, column: column});
+				const id = mine_id;
+				updateCellDispatch(position, id, 'content', 'MINE');
+				addMineDispatch(id);
+				placed++;
 				}
 			}
 		}
-	}
 
 
 	buildBoard(board){
@@ -148,13 +150,12 @@ export default class MineSweeper extends Component {
 					});
 				row_array = row_array.set(row_array.size, cell);
 
-			}
+				}
 			addRowDisptach(row_array);
-		}
+			}
 
 		const board_state = this.props.board;
-		this.setbuildingBoard(false);
-	}
+		}
 
 
 	switchLevels(level='BEGINNER'){
@@ -166,41 +167,41 @@ export default class MineSweeper extends Component {
 						mines: 10,
 						rows: 9,
 						columns: 9,
-					};
-					changeLevelDispatch(Immutable.fromJS(board));
-					this.buildBoard(board);
-					break;
+						};
+				changeLevelDispatch(Immutable.fromJS(board));
+				this.buildBoard(board);
+				break;
 				case 'INTERMEDIATE':
 					board = {
 						difficulty: 'INTERMEDIATE',
 						mines: 40,
 						rows: 18,
 						columns: 18,
-					};
-					changeLevelDispatch(Immutable.fromJS(board));
-					this.buildBoard(board);
-					break;
+						};
+				changeLevelDispatch(Immutable.fromJS(board));
+				this.buildBoard(board);
+				break;
 				case 'EXPERT':
 					board = {
 						difficulty: 'EXPERT',
 						mines: 99,
 						rows: 26,
 						columns: 26,
-					};
-					changeLevelDispatch(Immutable.fromJS(board));
-					this.buildBoard(board);
-					break;
+						};
+				changeLevelDispatch(Immutable.fromJS(board));
+				this.buildBoard(board);
+				break;
 				default:
 					board = {
 						level: 'BEGINNER',
 						mines: 10,
 						rows: 9,
 						columns: 9,
-					};
-					this.buildBoard(board);
-					break;
+						};
+				this.buildBoard(board);
+				break;
+				}
 		}
-	}
 
 	initGame(){
 		const {
@@ -210,25 +211,32 @@ export default class MineSweeper extends Component {
 		clearBoardDispatch();
 		const buildBoard = new Promise((resolve, reject) => {
 			resolve(this.switchLevels(difficulty));
-		});
-		// this.switchLevels(level);
+			});
 		buildBoard.then(() => {
 			this.setMines();
 			this.setProximityMineCount();
-		});
-	}
-
-
+			});
+		}
 
 	componentDidMount(){
 		this.initGame();
-	}
+		}
 
 	render() {
-		return(
-			<div>
-				<Board />
-			</div>
-		)
+		const { board } = this.props;
+		console.log('loading status', this.state.loading_board);
+		if(this.state.loading_board){
+			return(
+				<div>
+					loading Game
+				</div>
+			);
+			} else {
+				return(
+					<div style={BoardClass}>
+						<Board board={board} />
+					</div>
+				)
+			}
 	}
 }
