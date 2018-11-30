@@ -3,76 +3,98 @@ import ImageComponent				from './Image';
 import Immutable						from 'immutable';
 import { connect }					from 'react-redux';
 import { 
-	addRow,
-	clearBoard,
 	updateCell,
-	addMine,
-	changeLevel,
 }														from '../redux/actions';
+
 
 const mapStateToProps = (state) => {
 	return {
-		difficulty: state.getIn(['level', 'difficulty'], 'BEGINNER'),
 		board: state.get('board'),
-		mines: state.getIn(['level', 'mines'], 10),
 		mine_positions: state.get('mine_positions'),
 	}	
 }
 
 const mapDispathToProps = (dispatch) => {
 	return {
-		addRowDisptach: (row) => {
-			dispatch(addRow(row))
-		},
-		clearBoardDispatch: () => {
-			dispatch(clearBoard())
-		},
 		updateCellDispatch: (position, id, key, value) => {
 			dispatch(updateCell(position, id, key, value))
-		},
-		addMineDispatch: (mine_id) => {
-			dispatch(addMine(mine_id))
-		},
-		changeLevelDispatch: (level) => {
-			dispatch(changeLevel(level))
 		},
 	}
 }
 
 
 @connect(mapStateToProps, mapDispathToProps)
-
 export default class Cell extends Component {
 	constructor(props){
 		super(props);
 		this.handleClick = this.handleClick.bind(this);
 		this.revealCell = this.revealCell.bind(this);
+		this.returnCell = this.returnCell.bind(this);
+		this.checkForEmptyCell = this.checkForEmptyCell.bind(this);
+		this.emptyCellLoop = this.emptyCellLoop.bind(this);
 	}
-	revealCell(position, cell){
-		const { updateCellDispatch } = this.props;
+
+	checkForEmptyCell(row, column){
+		const { board } = this.props;
+		const content = board.getIn([row, column, 'content']);
+		return (content === 0);
+	}
+	returnCell(row, column){
+		const { board } = this.props;
+		const cell = board.getIn([row, column]);
+		return cell;
+	}
+
+	revealCell(cell){
+		const { updateCellDispatch, board } = this.props;
 		const id = cell.get('id');
-		updateCellDispatch(position, id, 'status', 'REVEALED');
+		const position = Immutable.fromJS({
+			row: cell.get('row'),
+			column: cell.get('column')
+		});	
+		const updateCellPromise = new Promise((resolve, reject) => {
+			resolve(updateCellDispatch(position, id, 'status', 'REVEALED'));
+		})
+		if(cell.get('status') === 'HIDDEN'){
+			updateCellPromise.then(() => {
+				if(this.checkForEmptyCell(cell.get('row'), cell.get('column'))){
+					this.emptyCellLoop(cell);
+				}
+			})
+		}
+	}
+
+	emptyCellLoop(cell){
+		const { board } = this.props;
+		console.log('cell', cell.toJS());
+		if(cell.get('column') != 0){
+			const cell_to_reveal = board.getIn([cell.get('row'), (cell.get('column')-1)]);
+			this.revealCell(cell_to_reveal);
+		}
+		if(cell.get('column') != 9){ 
+			const cell_to_reveal = board.getIn([cell.get('row'), (cell.get('column')+1)]);
+			this.revealCell(cell_to_reveal);
+		}
 	}
 
 	handleClick(cell){
 		const id = cell.get('id');
-		const { updateCellDispatch } = this.props;
+		const cell_status = cell.get('status');
 		const cell_content = cell.get('content');
-		const position = Immutable.fromJS({
-			row: id[0],
-			column: id[2]
-		});
-		if(cell_content != 'MINE'){
-			this.revealCell(position, cell);
+		const { updateCellDispatch } = this.props;
+		if(cell_status === 'REVEALED'){
+			console.log('revealed');
+			return;
 		} else if (cell_content === 'MINE'){
-			updateCellDispatch(position, id, 'content', 'BOMB');
-			this.revealCell(position, cell);
+			console.log('mine');
+		} else {
+			this.revealCell(cell);
 		}
 	}
 	render(){
 		const {
 			cell_state	
-		} = this.props;
+			} = this.props;
 		const cell_content = cell_state.get('content');
 		const status = cell_state.get('status');
 		const id = cell_state.get('id');
@@ -82,12 +104,12 @@ export default class Cell extends Component {
 				cell_content={cell_content} 
 				handleClick={this.handleClick}
 			/>);
-		} else {
-			return( <ImageComponent 
-				cell_state={cell_state}
-				cell_content={'HIDDEN'} 
-				handleClick={this.handleClick}
-			/>);
+			} else {
+				return( <ImageComponent 
+					cell_state={cell_state}
+					cell_content={'HIDDEN'} 
+					handleClick={this.handleClick}
+				/>);
+				}
 		}
-	}
 }

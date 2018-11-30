@@ -70,7 +70,6 @@ export default class MineSweeper extends Component {
 
 	returnMineCount(row, column){
 		const board = this.props.board;
-
 		if(board.getIn([row, column, 'content']) === 'MINE'){
 			return 1;
 		} else {
@@ -147,6 +146,8 @@ export default class MineSweeper extends Component {
 					id: row + "-" + column,
 					content: 'EMPTY',
 					status: 'HIDDEN',
+					row: row,
+					column: column
 					});
 				row_array = row_array.set(row_array.size, cell);
 
@@ -224,7 +225,6 @@ export default class MineSweeper extends Component {
 
 	render() {
 		const { board } = this.props;
-		console.log('loading status', this.state.loading_board);
 		if(this.state.loading_board){
 			return(
 				<div>
