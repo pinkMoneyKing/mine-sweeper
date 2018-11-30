@@ -66,14 +66,34 @@ export default class Cell extends Component {
 
 	emptyCellLoop(cell){
 		const { board } = this.props;
-		console.log('cell', cell.toJS());
+		const board_length = board.toJS().length;
 		if(cell.get('column') != 0){
 			const cell_to_reveal = board.getIn([cell.get('row'), (cell.get('column')-1)]);
 			this.revealCell(cell_to_reveal);
 		}
-		if(cell.get('column') != 9){ 
+		if(cell.get('column') != board_length){ 
 			const cell_to_reveal = board.getIn([cell.get('row'), (cell.get('column')+1)]);
 			this.revealCell(cell_to_reveal);
+		}
+		if(cell.get('row') != 0){ 
+			if(cell.get('column') != 0){
+				const cell_to_reveal = board.getIn([cell.get('row')-1, (cell.get('column')-1)]);
+				this.revealCell(cell_to_reveal);
+			}
+			if(cell.get('column') != board_length){ 
+				const cell_to_reveal = board.getIn([cell.get('row')-1, (cell.get('column')+1)]);
+				this.revealCell(cell_to_reveal);
+			}
+		}
+		if(cell.get('row') != board_length){ 
+			if(cell.get('column') != 0){
+				const cell_to_reveal = board.getIn([cell.get('row')+1, (cell.get('column')-1)]);
+				this.revealCell(cell_to_reveal);
+			}
+			if(cell.get('column') != board_length){ 
+				const cell_to_reveal = board.getIn([cell.get('row')+1, (cell.get('column')+1)]);
+				this.revealCell(cell_to_reveal);
+			}
 		}
 	}
 
